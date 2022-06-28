@@ -24,16 +24,26 @@ regexp="${regexp}.{$min_length,$max_length}$"
 
 
 if [[ ! $START_LINE =~ $regexp ]]; then
-  # commit message is invalid according to config - block commit
-  commit_message=$1
-  regular_expression=$2
-  echo -e "\n\e[31m[Invalid Commit Message]"
-  echo -e "------------------------\033[0m\e[0m"
-  echo -e "Valid types: \e[36m${types[@]}\033[0m"
-  echo -e "Max length (first line): \e[36m$max_length\033[0m"
-  echo -e "Min length (first line): \e[36m$min_length\033[0m\n"
-  echo -e "\e[37mRegex: \e[33m${regular_expression}\033[0m"
-  echo -e "\e[37mActual commit message: \e[33m\"${commit_message}\"\033[0m"
-  echo -e "\e[37mActual length: \e[33m$(echo ${commit_message} | wc -c)\033[0m\n"
+  echo -e "\n[Invalid Commit Message]"
+  echo -e "------------------------"
+  echo -e "Valid types: ${types[*]}"
+  echo -e "\nMax length (first line): $max_length"
+  echo -e "Min length (first line): $min_length"
+  echo -e "\nRegex: $regexp"
+  echo -e "\nActual commit message: \"$(cat "$1")\""
+  echo -e "Actual length:   $(wc -c < "$1")\n"
+  exit 1
+fi
+
+regexp="\n(Ref|Refs): ([A-z0-9\-]+/)+[A-z0-9\-]+#[0-9]+"
+if [[ ! $START_LINE =~ $regexp ]]; then
+  echo -e "[No issue reference found]"
+  echo -e "--------------------------\n"
+  echo -e "Line with issue reference should starts on a new line separated"
+  echo -e "from first line or commit description with an empty line."
+  echo -e "For more information see: https://guidelines.adprojects.ru/development/git-commit/\n"
+  echo -e "Regex: $regexp\n"
+  echo -e "Actual commit message:\n"
+  echo -e "${START_LINE}"
   exit 1
 fi
