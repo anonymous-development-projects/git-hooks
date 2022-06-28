@@ -6,7 +6,7 @@ fi
 
 destination="${PWD}/.git/hooks"
 
-curl -Ls https://raw.githubusercontent.com/anonymous-development-projects/git-hooks/master/hooks/commit-msg -o "${destination}/commit-msg"
+curl -s https://raw.githubusercontent.com/anonymous-development-projects/git-hooks/master/hooks/commit-msg -o "${destination}/commit-msg"
 chmod u+x "${destination}/commit-msg"
 
 echo "Installed git hook as commit-msg hook in ${destination}."

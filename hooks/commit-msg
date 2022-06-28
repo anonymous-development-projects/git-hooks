@@ -5,11 +5,6 @@ types=(build ci docs feat fix perf refactor style test chore)
 min_length=1
 max_length=52
 
-
-# get the first line of the commit message
-INPUT_FILE=$1
-START_LINE=$(head -n1 "$INPUT_FILE")
-
 # build regexp
 regexp="^[.0-9]+$|"
 if $revert; then
@@ -22,26 +17,25 @@ done
 regexp="${regexp%|})(\(.+\))?: "
 regexp="${regexp}.{$min_length,$max_length}$"
 
-
-if [[ ! $START_LINE =~ $regexp ]]; then
-  echo -e "\n[Invalid Commit Message]"
+if [[ ! $(head -n1 "$1") =~ $regexp ]]; then
+  echo -e "[Invalid Commit Message]"
   echo -e "------------------------"
-  echo -e "Valid types: ${types[*]}"
-  echo -e "\nMax length (first line): $max_length"
-  echo -e "Min length (first line): $min_length"
-  echo -e "\nRegex: $regexp"
-  echo -e "\nActual commit message: \"$(cat "$1")\""
-  echo -e "Actual length:   $(wc -c < "$1")\n"
+  echo -e "Valid types: ${types[*]}\n"
+  echo -e "Max length (first line): $max_length"
+  echo -e "Min length (first line): $min_length\n"
+  echo -e "Regex: $regexp\n"
+  echo -e "Actual commit message: \"$(cat "$1")\""
+  echo -e "Actual length:   $(wc -c < "$1")"
   exit 1
 fi
 
 regexp="\n(Ref|Refs): ([A-z0-9\-]+/)+[A-z0-9\-]+#[0-9]+"
-if [[ ! $START_LINE =~ $regexp ]]; then
+if [[ ! $(cat "$1") =~ $regexp ]]; then
   echo -e "[No issue reference found]"
   echo -e "--------------------------\n"
   echo -e "Line with issue reference should starts on a new line separated"
   echo -e "from first line or commit description with an empty line."
-  echo -e "For more information see: https://guidelines.adprojects.ru/development/git-commit/\n"
+  echo -e "For more information see: https://guidelines.adprojects.ru/development/git-commit/\n\n"
   echo -e "Regex: $regexp\n"
   echo -e "Actual commit message:\n"
   echo -e "${START_LINE}"
