@@ -29,15 +29,19 @@ if [[ ! $(head -n1 "$1") =~ $regexp ]]; then
   exit 1
 fi
 
-regexp="\n(Ref|Refs): ([A-z0-9\-]+/)+[A-z0-9\-]+#[0-9]+"
-if [[ ! $(cat "$1") =~ $regexp ]]; then
+regexp="(Ref|Refs): ([A-z0-9\-]+/)+[A-z0-9\-]+#[0-9]+$"
+COMMIT_MESSAGE="$(cat "$1")"
+
+if [[ ! "${COMMIT_MESSAGE}" =~ $regexp ]]; then
   echo -e "[No issue reference found]"
   echo -e "--------------------------\n"
-  echo -e "Line with issue reference should starts on a new line separated"
-  echo -e "from first line or commit description with an empty line."
+  echo -e "Issue reference line should:"
+  echo -e " - starts on a new line"
+  echo -e " - be separated from the commit message body with an empty line"
+  echo -e " - be the last line of the commit message\n"
   echo -e "For more information see: https://guidelines.adprojects.ru/development/git-commit/\n\n"
   echo -e "Regex: $regexp\n"
   echo -e "Actual commit message:\n"
-  echo -e "${START_LINE}"
+  echo -e "${COMMIT_MESSAGE}"
   exit 1
 fi
