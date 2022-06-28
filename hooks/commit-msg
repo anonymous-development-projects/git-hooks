@@ -1,0 +1,39 @@
+#!/bin/bash
+
+revert=false
+types=(build ci docs feat fix perf refactor style test chore)
+min_length=1
+max_length=52
+
+
+# get the first line of the commit message
+INPUT_FILE=$1
+START_LINE=$(head -n1 "$INPUT_FILE")
+
+# build regexp
+regexp="^[.0-9]+$|"
+if $revert; then
+    regexp="${regexp}^([Rr]evert|[Mm]erge):? )?.*$|^("
+fi
+for type in "${types[@]}"
+do
+  regexp="${regexp}$type|"
+done
+regexp="${regexp%|})(\(.+\))?: "
+regexp="${regexp}.{$min_length,$max_length}$"
+
+
+if [[ ! $START_LINE =~ $regexp ]]; then
+  # commit message is invalid according to config - block commit
+  commit_message=$1
+  regular_expression=$2
+  echo -e "\n\e[31m[Invalid Commit Message]"
+  echo -e "------------------------\033[0m\e[0m"
+  echo -e "Valid types: \e[36m${types[@]}\033[0m"
+  echo -e "Max length (first line): \e[36m$max_length\033[0m"
+  echo -e "Min length (first line): \e[36m$min_length\033[0m\n"
+  echo -e "\e[37mRegex: \e[33m${regular_expression}\033[0m"
+  echo -e "\e[37mActual commit message: \e[33m\"${commit_message}\"\033[0m"
+  echo -e "\e[37mActual length: \e[33m$(echo ${commit_message} | wc -c)\033[0m\n"
+  exit 1
+fi
