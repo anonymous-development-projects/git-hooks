@@ -29,7 +29,7 @@ if [[ ! $(head -n1 "$1") =~ $regexp ]]; then
   exit 1
 fi
 
-regexp="(Ref|Refs): ([A-Za-z0-9\-]+/)+[A-Za-z0-9\-]+#[0-9]+$"
+regexp="(Ref|Refs): (([A-Za-z0-9\-]+/)+[A-Za-z0-9\-]+#[0-9]+,? ?)+$"
 COMMIT_MESSAGE="$(cat "$1")"
 
 if [[ ! "${COMMIT_MESSAGE}" =~ $regexp ]]; then
