@@ -14,10 +14,12 @@ for type in "${types[@]}"
 do
   regexp="${regexp}$type|"
 done
-regexp="${regexp%|})(\(.+\))?: "
+regexp="(${regexp%|})(\(.+\))?: "
 regexp="${regexp}.{$min_length,$max_length}$"
 
-if [[ ! $(head -n1 "$1") =~ $regexp ]]; then
+FIRST_LINE=$(head -n1 "$1")
+
+if [[ ! ${FIRST_LINE} =~ $regexp ]]; then
   echo -e "[Invalid Commit Message]"
   echo -e "------------------------"
   echo -e "Valid types: ${types[*]}\n"
@@ -25,7 +27,7 @@ if [[ ! $(head -n1 "$1") =~ $regexp ]]; then
   echo -e "Min length (first line): $min_length\n"
   echo -e "Regex: $regexp\n"
   echo -e "Actual commit message: \"$(head -n1 "$1")\""
-  echo -e "Actual length:   $(wc -c < "$1")"
+  echo -e "Actual length:   $(echo "${FIRST_LINE}" | wc -c)"
   exit 1
 fi
 
